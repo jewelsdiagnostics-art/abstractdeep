@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="ConfMS — Conference Abstract Submission and Review Management System">
+  <meta name="theme-color" content="#1a56db">
+  <title>ConfMS — Abstract Management System</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/main.css">
+
+  <style>
+    /* Critical inline styles for initial render */
+    #authView, #appView { min-height: 100vh; }
+    #appView { display: flex; min-height: 100vh; }
+    #mainView { flex: 1; display: flex; flex-direction: column; }
+    .d-none { display: none !important; }
+    
+    .page-content { animation: fadeInUp 0.3s ease; }
+    @keyframes fadeInUp { 
+      from { opacity: 0; transform: translateY(10px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    @media print {
+      .sidebar, .topbar, .topbar-actions, .btn, .table-actions { display: none !important; }
+      .main-content { margin-left: 0 !important; }
+    }
+
+    .skeleton { background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  </style>
+</head>
+<body>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title confirm-title">Confirm Action</div>
+      <button class="modal-close" onclick="UI.closeModal('confirmModal')" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="confirm-message"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="UI.closeModal('confirmModal')">Cancel</button>
+      <button class="btn btn-danger confirm-ok-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dynamic Modal Containers -->
+<div id="abstractDetailModal"></div>
+<div id="reviewFormModal"></div>
+<div id="assignReviewersModal"></div>
+
+<!-- Auth View -->
+<div id="authView">
+  <div id="authContent"><div class="skeleton" style="height:100vh;"></div></div>
+</div>
+
+<!-- App View -->
+<div id="appView" class="d-none">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">ConfMS</div>
+        <div class="sidebar-brand-sub">Abstract Management</div>
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">?</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebarUserName">Loading...</div>
+        <div class="sidebar-user-role" id="sidebarUserRole">—</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-footer-btn" onclick="Auth.logout()" aria-label="Sign Out">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div id="mainView"></div>
+  </div>
+</div>
+
+<!-- Scripts - Load in correct order -->
+<script src="assets/js/app.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/author.js"></script>
+<script src="assets/js/reviewer.js"></script>
+<script src="assets/js/admin.js"></script>
+
+<script>
+  // Initialize app when DOM is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof initApp === 'function') {
+      initApp();
+    } else {
+      console.error('App initialization failed - scripts may not have loaded correctly');
+    }
+  });
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && typeof UI !== 'undefined') UI.closeAllModals();
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      var search = document.querySelector('.topbar-search input');
+      if (search) search.focus();
+    }
+  });
+</script>
+</body>
+</html>
